@@ -1,0 +1,12 @@
+[package]
+name = "kinesis-crowbar"
+version = "0.1.0"
+authors = ["ROki1988 <roki.swindler@gmail.com>"]
+
+[lib]
+name = "lambda"
+crate-type = ["cdylib"]
+
+[dependencies]
+crowbar = "0.2"
+cpython = "0.1"
