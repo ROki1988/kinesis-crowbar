@@ -8,3 +8,7 @@ phases:
 artifacts:
   files:
     - lambda.zip
+
+cache:
+  paths:
+    - '/root/.cargo/**/*'
