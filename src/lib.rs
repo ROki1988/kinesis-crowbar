@@ -3,8 +3,34 @@ extern crate crowbar;
 #[macro_use]
 extern crate cpython;
 
+extern crate serde;
+extern crate serde_json;
+
+#[macro_use]
+extern crate serde_derive;
+
 lambda!(|event, context| {
-    println!("hi cloudwatch logs, this is {}", context.function_name());
-    // return the event without doing anything with it
-    Ok("hello world!")
+    let xs: Vec<Record> = serde_json::from_value(event["Records"].clone())?;
+    Ok(xs)
 });
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Record {
+    eventId: String,
+    eventVersion: String,
+    kinesis: Kinesis,
+    invokeIdentityArn: String,
+    eventName: String,
+    eventSourceARN: String,
+    eventSource: String,
+    awsRegion: String
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Kinesis {
+    approximateArrivalTimestamp: u32,
+    partitionKey: String,
+    data: String,
+    kinesisSchemaVersion: String,
+    sequenceNumber: String,
+}
