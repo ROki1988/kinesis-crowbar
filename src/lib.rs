@@ -10,13 +10,14 @@ extern crate serde_json;
 extern crate serde_derive;
 
 lambda!(|event, context| {
+
     let xs: Vec<Record> = serde_json::from_value(event["Records"].clone())?;
     Ok(xs)
 });
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Record {
-    eventId: String,
+    eventID: String,
     eventVersion: String,
     kinesis: Kinesis,
     invokeIdentityArn: String,
