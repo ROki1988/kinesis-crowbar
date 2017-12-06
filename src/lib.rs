@@ -10,14 +10,16 @@ extern crate serde_json;
 extern crate serde_derive;
 
 extern crate data_encoding;
+extern crate rayon;
 
 use data_encoding::BASE64;
+use rayon::prelude::*;
 
 
 lambda!(|event, context| {
 
     let xs: Vec<Record> = serde_json::from_value(event["Records"].clone())?;
-    let h = xs.into_iter()
+    let h = xs.into_par_iter()
         .filter_map(|x| BASE64.decode(x.kinesis.data.as_bytes()).ok())
         .filter_map(|x| String::from_utf8(x).ok())
         .collect::<Vec<String>>();
