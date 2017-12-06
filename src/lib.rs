@@ -38,7 +38,7 @@ struct Record {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Kinesis {
-    approximateArrivalTimestamp: u32,
+    approximateArrivalTimestamp: f64,
     partitionKey: String,
     data: String,
     kinesisSchemaVersion: String,
