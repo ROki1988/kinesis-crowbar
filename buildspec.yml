@@ -1,9 +1,13 @@
 version: 0.2
 
+env:
+  variables:
+    CARGO_FLAGS: "-j 4"
+
 phases:
   build:
     commands:
-      - build.sh > lambda.zip
+      - build.sh openssl-devel > lambda.zip
 
 artifacts:
   files:
