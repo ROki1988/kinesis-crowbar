@@ -12,18 +12,38 @@ extern crate serde_derive;
 extern crate data_encoding;
 extern crate rayon;
 
+extern crate rusoto_core;
+extern crate rusoto_s3;
+
+use rusoto_s3::{S3, S3Client, PutObjectRequest};
+use rusoto_core::DefaultCredentialsProvider;
+use rusoto_core::region::default_region;
+use rusoto_core::default_tls_client;
+
+use std::env;
+
 use data_encoding::BASE64;
 use rayon::prelude::*;
 
 
 lambda!(|event, context| {
+    let provider = DefaultCredentialsProvider::new().unwrap();
+    let client = S3Client::new(default_tls_client().unwrap(), provider, default_region());
 
     let xs: Vec<Record> = serde_json::from_value(event["Records"].clone())?;
     let h = xs.into_par_iter()
         .filter_map(|x| BASE64.decode(x.kinesis.data.as_bytes()).ok())
         .filter_map(|x| String::from_utf8(x).ok())
         .collect::<Vec<String>>();
-    Ok(h)
+
+    let request = PutObjectRequest {
+        bucket: env::var("TARGET_BUCKET").unwrap(),
+        key: "sample".to_owned(),
+        body: serde_json::to_vec(&h).ok(),
+        ..Default::default()
+    };
+    let out = client.put_object(&request).unwrap();
+    Ok(())
 });
 
 #[derive(Serialize, Deserialize, Debug)]
