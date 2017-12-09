@@ -24,11 +24,12 @@ use std::env;
 
 use data_encoding::BASE64;
 use rayon::prelude::*;
+use crowbar::{Value, LambdaContext, LambdaResult};
 
-
-lambda!(|event, context| {
-    let provider = DefaultCredentialsProvider::new().unwrap();
-    let client = S3Client::new(default_tls_client().unwrap(), provider, default_region());
+fn my_handler(event: Value, context: LambdaContext) -> LambdaResult {
+    let provider = DefaultCredentialsProvider::new()?;
+    let tls = default_tls_client()?;
+    let client = S3Client::new(tls, provider, default_region());
 
     let xs: Vec<Record> = serde_json::from_value(event["Records"].clone())?;
     let h = xs.into_par_iter()
@@ -36,15 +37,18 @@ lambda!(|event, context| {
         .filter_map(|x| String::from_utf8(x).ok())
         .collect::<Vec<String>>();
 
+    let bucket = env::var("TARGET_BUCKET")?;
     let request = PutObjectRequest {
-        bucket: env::var("TARGET_BUCKET").unwrap(),
+        bucket,
         key: "sample".to_owned(),
         body: serde_json::to_vec(&h).ok(),
         ..Default::default()
     };
-    let out = client.put_object(&request).unwrap();
-    Ok(())
-});
+    let out = client.put_object(&request)?;
+    Ok(serde_json::Value::from("success".to_owned()))
+}
+
+lambda!(my_handler);
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Record {
