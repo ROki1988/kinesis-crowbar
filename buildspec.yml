@@ -3,7 +3,7 @@ version: 0.2
 phases:
   build:
     commands:
-      - build.sh openssl-devel > lambda.zip
+      - build.sh > lambda.zip
 
 artifacts:
   files:
