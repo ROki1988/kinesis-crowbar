@@ -8,8 +8,8 @@ name = "lambda"
 crate-type = ["cdylib"]
 
 [dependencies]
-crowbar = {git = "https://github.com/ramn/rust-crowbar"}
-cpython = "0.1"
+crowbar = { version = "0.2", default-features = false }
+cpython = { version = "0.1", default-features = false, features = ["python27-sys"] }
 serde = "1.0"
 serde_derive = "1.0"
 serde_json = "1.0"
