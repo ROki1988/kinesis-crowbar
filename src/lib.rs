@@ -40,8 +40,9 @@ fn my_handler(event: Value, context: LambdaContext) -> LambdaResult {
     let bucket = env::var("TARGET_BUCKET")?;
     let request = PutObjectRequest {
         bucket,
-        key: "sample".to_owned(),
+        key: "sample.json".to_owned(),
         body: serde_json::to_vec(&h).ok(),
+        content_type: Some("application/json".to_owned()),
         ..Default::default()
     };
     let out = client.put_object(&request)?;
